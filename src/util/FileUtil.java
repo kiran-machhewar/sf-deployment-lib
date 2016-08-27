@@ -34,6 +34,7 @@ public class FileUtil {
 	}
 	
 	public static byte[] processZipToKeepSrcFolderOnly(byte zipInputData[]) throws IOException {
+		System.out.println("Getting the src folder:");
 	    ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(zipInputData));		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ZipOutputStream zos = new ZipOutputStream(baos);
@@ -74,7 +75,6 @@ public class FileUtil {
 
 		// optional default is GET
 		con.setRequestMethod("GET");
-
 	
 		int responseCode = con.getResponseCode();
 		System.out.println("\nSending 'GET' request to URL for file download: " + file);
@@ -92,7 +92,7 @@ public class FileUtil {
 	    }
 		byte [] byteArray = baos.toByteArray();
 		baos.close();
-		
+		System.out.println("File is downloaded.");
 		return byteArray;
 	}
 }
