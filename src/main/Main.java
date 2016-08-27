@@ -48,7 +48,7 @@ public class Main {
         FileUtil.createFileFromByteArray(zipData,new File("Download.zip"));
         zipData = FileUtil.processZipToKeepSrcFolderOnly(zipData);
         FileUtil.createFileFromByteArray(zipData,new File("Clean.zip"));
-        //deploymentUtil.deployFromZipByteArrayData(zipData, deployOptions, targetConnection);
+        deploymentUtil.deployFromZipByteArrayData(zipData, deployOptions, targetConnection);
 	}
 	
 
