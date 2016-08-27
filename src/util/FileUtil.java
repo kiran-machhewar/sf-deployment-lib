@@ -1,16 +1,21 @@
 package util;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class FileUtil {
 
+	public static boolean localRun = false;
 	public static byte [] getBytesFromFile(File file) throws IOException{
 		byte bytes[] = null;
 		try (FileInputStream fis = new FileInputStream(file)) {
@@ -27,82 +32,68 @@ public class FileUtil {
 		}
 		return bytes;
 	}
-	public static void main(String[] args) {
-		try {
-			createZipFileFromAFolderOfZipFile();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	
+	public static byte[] processZipToKeepSrcFolderOnly(byte zipInputData[]) throws IOException {
+	    ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(zipInputData));		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zos = new ZipOutputStream(baos);
+		byte[]          buffer = new byte[512];
+		ZipEntry entry = zin.getNextEntry();
+		while (entry !=null) {		
+			if(entry.getName().contains("/src/") && entry.isDirectory()){
+				break;
+			}
+			entry = zin.getNextEntry();
 		}
-	}
-	
-	
-	public static void createZipFileFromAFolderOfZipFile() throws Exception{
-		
-    	unZipIt("D:\\Returns\\SFChangeSetTool-master.zip","OT");
-	}
-	
-	   /**
-     * Unzip it
-     * @param zipFile input zip file
-     * @param output zip file output folder
-     */
-    public static void unZipIt(String zipFile, String outputFolder){
-
-     byte[] buffer = new byte[1024];
-
-     try{
-
-    	//create output directory is not exists
-    	File folder = new File("output.zip");
-    	if(!folder.exists()){
-    		folder.mkdir();
-    	}
-
-    	//get the zip file content
-    	ZipInputStream zis =
-    		new ZipInputStream(new FileInputStream(zipFile));
-    	//get the zipped file list entry
-    	ZipEntry ze = zis.getNextEntry();
-
-    	while(ze!=null){
-    		System.out.println("ze name-->"+ze.getName()+"---"+ze.isDirectory());
-    		
-    		if(ze.getName().contains("/src/") && ze.isDirectory()){
-    			break;
-    		}
-    		ze = zis.getNextEntry();
-    	}
-    	while(ze!=null){
-
-    	   String fileName = ze.getName();
-           File newFile = new File(outputFolder + File.separator + fileName);
-
-           System.out.println("file unzip : "+ newFile.getAbsoluteFile());
-
-            //create all non exists folders
-            //else you will hit FileNotFoundException for compressed folder
-            new File(newFile.getParent()).mkdirs();
-
-            FileOutputStream fos = new FileOutputStream(newFile);
-
-            int len;
-            while ((len = zis.read(buffer)) > 0) {
-       		fos.write(buffer, 0, len);
+		while (entry !=null) {
+	        // create a new empty ZipEntry			
+	        ZipEntry newEntry = new ZipEntry("src"+entry.getName().split("/src")[1]);
+	        zos.putNextEntry(newEntry);
+	        int len = 0;
+            while ((len = zin.read(buffer)) > 0)
+            {
+            	zos.write(buffer, 0, len);
             }
-
-            fos.close();
-            ze = zis.getNextEntry();
-    	}
-
-        zis.closeEntry();
-    	zis.close();
-
-    	System.out.println("Done");
-
-    }catch(IOException ex){
-       ex.printStackTrace();
+		    entry = zin.getNextEntry();
+		}
+		baos.close();
+		zos.close();
+		byte  [] byteArray = baos.toByteArray();
+		return byteArray;
     }
-   }
+	
+	public static void createFileFromByteArray(byte [] byteArray,File file) throws Exception{
+		FileOutputStream fos = new FileOutputStream(file);
+		fos.write(byteArray);
+		fos.close();
+	}
+	
+	public static byte[] downloadFile(String file) throws Exception{
+		URL obj = new URL(file);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		// optional default is GET
+		con.setRequestMethod("GET");
+
+	
+		int responseCode = con.getResponseCode();
+		System.out.println("\nSending 'GET' request to URL for file download: " + file);
+		System.out.println("Response Code : " + responseCode);
+
+		con.getInputStream();
+		InputStream is = con.getInputStream();
+
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    
+	    byte[] buffer = new byte[4096];
+	    int len;
+	    while ((len = is.read(buffer)) > 0) {
+	        baos.write(buffer, 0, len);
+	    }
+		byte [] byteArray = baos.toByteArray();
+		baos.close();
+		
+		return byteArray;
+	}
 }
 	

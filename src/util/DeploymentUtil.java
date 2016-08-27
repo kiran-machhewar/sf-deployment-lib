@@ -3,6 +3,7 @@ package util;
 import java.io.File;
 
 import com.sforce.soap.metadata.*;
+import com.sforce.ws.ConnectionException;
 /**
  * Sample that logs in and shows a menu of retrieve and deploy metadata options.
  */
@@ -18,7 +19,10 @@ public class DeploymentUtil {
 
 		public void deployFromZipFile(File zipFilePath, DeployOptions deployOptions, MetadataConnection targetConnection) throws Exception{
 			byte[] zipBytes = FileUtil.getBytesFromFile(zipFilePath);
-			
+			deployFromZipByteArrayData(zipBytes,deployOptions,targetConnection);
+		}
+		
+		public void deployFromZipByteArrayData(byte[] zipBytes, DeployOptions deployOptions, MetadataConnection targetConnection) throws Exception{
 			AsyncResult asyncResult = targetConnection.deploy(zipBytes, deployOptions);
 	        DeployResult result = waitForDeployCompletion(asyncResult.getId(),targetConnection);
 	        if (!result.isSuccess()) {
