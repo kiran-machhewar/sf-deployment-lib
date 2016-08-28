@@ -3,7 +3,6 @@ package util;
 import java.io.File;
 
 import com.sforce.soap.metadata.*;
-import com.sforce.ws.ConnectionException;
 /**
  * Sample that logs in and shows a menu of retrieve and deploy metadata options.
  */

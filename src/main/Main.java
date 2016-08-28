@@ -10,7 +10,6 @@ import util.MetadataLoginUtil;
 import com.sforce.soap.metadata.DeployOptions;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.soap.metadata.TestLevel;
-import com.sforce.ws.ConnectionException;
 
 
 public class Main {
